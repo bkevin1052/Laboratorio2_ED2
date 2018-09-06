@@ -16,8 +16,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FilesActivity" />
-        <activity android:name=".ListFilesActivity"></activity>
+        <activity android:name=".FilesActivity"
+            android:label="@string/app_Archivo"/>
+        <activity android:name=".ListFilesActivity"
+            android:label="@string/app_listaArchivos"></activity>
     </application>
 
 </manifest>

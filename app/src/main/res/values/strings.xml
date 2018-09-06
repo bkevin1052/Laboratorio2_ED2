@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">Laboratorio2_ED2</string>
+    <string name="app_name">Algoritmos de compresion</string>
+    <string name="app_listaArchivos">Mis comprimidos</string>
+    <string name="app_Archivo">Archivo</string>
 </resources>
