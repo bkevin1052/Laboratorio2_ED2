@@ -61,8 +61,7 @@ public class FilesActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         Uri uri  = data.getData();
-                        String path = Environment.getExternalStorageDirectory() + "/" +uri.getPathSegments().get(0)+"s/"+"dataejemplo.txt";
-                        lecturaArchivo(path);
+                        contenido.setText(lecturaArchivo(uri));
                     } else {
                         Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
                     }
@@ -85,12 +84,11 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-    private String lecturaArchivo(String path){
+    private String lecturaArchivo(Uri uri){
 
-        File archivo = new File(path);
         StringBuilder texto = new StringBuilder();
         try{
-            InputStream f = new FileInputStream(archivo);
+            InputStream f = getContentResolver().openInputStream(uri);
             BufferedReader br = new BufferedReader(new InputStreamReader(f));
             String inputLine;
 
@@ -98,7 +96,6 @@ public class FilesActivity extends AppCompatActivity {
                 texto.append(" " + inputLine);
             }
             br.close();
-            contenido.setText(texto);
         }catch(Exception e){
             Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
         }
