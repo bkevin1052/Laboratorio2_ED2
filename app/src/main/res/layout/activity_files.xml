@@ -19,7 +19,7 @@
         android:text="Elegir Archivo" />
 
     <TextView
-        android:id="@+id/textViewContenio"
+        android:id="@+id/textViewContenido"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"

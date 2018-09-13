@@ -22,6 +22,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 
 public class FilesActivity extends AppCompatActivity {
 
@@ -35,7 +36,7 @@ public class FilesActivity extends AppCompatActivity {
         setContentView(R.layout.activity_files);
 
         elegirArchivo = (Button) findViewById(R.id.btnElegirArchivo);
-        contenido = (TextView) findViewById(R.id.textViewContenio);
+        contenido = (TextView) findViewById(R.id.textViewContenido);
 
         elegirArchivo.setOnClickListener(view -> {
 
@@ -59,8 +60,8 @@ public class FilesActivity extends AppCompatActivity {
             case PICK_CHOOSE_FILE:
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
-                        Uri uri = data.getData();
-                        String path = uri.getPath();
+                        Uri uri  = data.getData();
+                        String path = Environment.getExternalStorageDirectory() + "/" +uri.getPathSegments().get(0)+"s/"+"dataejemplo.txt";
                         lecturaArchivo(path);
                     } else {
                         Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
@@ -85,6 +86,7 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     private String lecturaArchivo(String path){
+
         File archivo = new File(path);
         StringBuilder texto = new StringBuilder();
         try{

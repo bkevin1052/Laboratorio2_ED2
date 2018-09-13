@@ -9,8 +9,7 @@ import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
-    Button btnHuffman;
-    Button btnLZW;
+    Button btnHuffman, btnLZW,btnMisCompresiones;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
         btnHuffman = (Button)findViewById(R.id.btnHuffman);
         btnLZW = (Button)findViewById(R.id.btnLzw);
+        btnMisCompresiones = (Button)findViewById(R.id.btnMisCompresiones);
 
         btnHuffman.setOnClickListener(view ->{
             startActivity(new Intent(getApplicationContext(), FilesActivity.class));
@@ -26,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
 
         btnLZW.setOnClickListener(view ->{
             startActivity(new Intent(getApplicationContext(),FilesActivity.class));
+        });
+
+        btnMisCompresiones.setOnClickListener(view ->{
+            startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
         });
     }
 }
