@@ -93,7 +93,7 @@ public class FilesActivity extends AppCompatActivity {
             String inputLine;
 
             while ((inputLine = br.readLine()) != null) {
-                texto.append(inputLine);
+                texto.append(" " + inputLine);
             }
             br.close();
             contenido.setText(texto);
