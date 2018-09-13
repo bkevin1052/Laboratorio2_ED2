@@ -15,7 +15,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="67dp"
         android:text="HUFFMAN"
-        android:background="@color/colorPrimaryDark"/>
+        android:backgroundTint="#FF5733"
+        android:background="@drawable/button_color"/>
 
     <Button
         android:id="@+id/btnLzw"
@@ -25,5 +26,6 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="169dp"
         android:text="LZW"
-        android:background="@color/colorPrimaryDark"/>
+        android:backgroundTint="#FF5733"
+        android:background="@drawable/button_color"/>
 </RelativeLayout>
