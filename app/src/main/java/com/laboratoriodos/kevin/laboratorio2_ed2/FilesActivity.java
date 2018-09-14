@@ -11,69 +11,83 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
-
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
 public class FilesActivity extends AppCompatActivity {
 
+    //VARIABLES
     public final int PICK_CHOOSE_FILE = 1;
     public static int seleccion = 0;
-    Button btnElegirArchivo,btnCifrar;
+    Button btnElegirArchivo, btnComprimir;
     TextView contenido;
-    Uri uriG;
     Huffman cifrado;
+    String data;
 
+
+    //METODOS
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_files);
 
         btnElegirArchivo = (Button) findViewById(R.id.btnElegirArchivo);
-        btnCifrar = (Button)findViewById(R.id.btnCifrar);
+        btnComprimir = (Button) findViewById(R.id.btnComprimir);
         contenido = (TextView) findViewById(R.id.textViewContenido);
+
+        contenido.setMovementMethod(new ScrollingMovementMethod());
 
         btnElegirArchivo.setOnClickListener(view -> {
 
-            Boolean hasPermission =( ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            //VERIFICAR PERMISOS
+            Boolean hasPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED);
-            if (!hasPermission){
+            if (!hasPermission) {
                 Log.e("MainActivity", "get permision   ");
-                ActivityCompat.requestPermissions( this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},1);
-            }else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            } else {
                 Log.e("MainActivity", "get permision-- already granted ");
                 subirArchivo();
             }
         });
 
-        btnCifrar.setOnClickListener(view ->{
-            switch (seleccion){
+        btnComprimir.setOnClickListener(view -> {
+            switch (seleccion) {
                 case 1:
                     cifrado = new Huffman(contenido.getText().toString());
                     int[] caracteresContador = new int[256];
-                    for(char c: cifrado.getCadena().toCharArray()){
+                    for (char c : cifrado.getCadena().toCharArray()) {
                         caracteresContador[c]++;
                     }
-                    contenido.setText(cifrado.cifrar(cifrado.arbolHuffman(caracteresContador),cifrado.getCadena()));
-                    escrituraArchivo();
-                    Toast.makeText(getApplicationContext(),"Compresion realizada correctamente",Toast.LENGTH_SHORT).show();
+                    data = cifrado.cifrar(cifrado.arbolHuffman(caracteresContador), cifrado.getCadena());
+                    contenido.setText(data);
+                    //VERIFICAR PERMISOS
+                    Boolean hasPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                            == PackageManager.PERMISSION_GRANTED);
+                    if (!hasPermission) {
+                        Log.e("MainActivity", "get permision   ");
+                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                    } else {
+                        Log.e("MainActivity", "get permision-- already granted ");
+                        escrituraArchivo();
+                    }
                     break;
                 case 2:
                     //LZW
                     break;
             }
-
-
         });
     }
 
@@ -85,7 +99,7 @@ public class FilesActivity extends AppCompatActivity {
             case PICK_CHOOSE_FILE:
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
-                        Uri uri  = data.getData();
+                        Uri uri = data.getData();
                         contenido.setText(lecturaArchivo(uri));
                     } else {
                         Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
@@ -98,21 +112,28 @@ public class FilesActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
-            case 1:{
-                if (grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
+        switch (requestCode) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     subirArchivo();
-                }else {
+                } else {
                     Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            case 2: {
+                if (grantResults.length > 0 && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                    escrituraArchivo();
+                } else {
+                    Toast.makeText(getApplicationContext(), "ERROR AL CREAR EL ARCHIVO", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
 
-    private String lecturaArchivo(Uri uri){
-        uriG = uri;
+    private String lecturaArchivo(Uri uri) {
         StringBuilder texto = new StringBuilder();
-        try{
+        try {
             InputStream f = getContentResolver().openInputStream(uri);
             BufferedReader br = new BufferedReader(new InputStreamReader(f));
             String inputLine;
@@ -121,10 +142,10 @@ public class FilesActivity extends AppCompatActivity {
                 texto.append(" " + inputLine);
             }
             br.close();
-        }catch(Exception e){
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
         }
-        return  texto.toString();
+        return texto.toString();
     }
 
     private void subirArchivo() {
@@ -138,17 +159,29 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-
     //FALTA
-    private void escrituraArchivo(){
+    private void escrituraArchivo() {
 
-            try {
-                File file = new File(getApplicationContext().getFilesDir(), "dataejemplo.huff");
-                FileOutputStream f = openFileOutput(file.getName(), Context.MODE_APPEND);
-                f.write(contenido.getText().toString().getBytes());
-                f.close();
-            } catch (Exception ex) {
-                Log.e("Error", "ex: " + ex);
-            }
+        //Obtiene ruta de sdcard
+        File pathToExternalStorage = Environment.getExternalStorageDirectory();
+        //agrega directorio /myFiles
+        File appDirectory = new File(pathToExternalStorage.getAbsolutePath() + "/Documents/");
+        //Si no existe la estructura, se crea usando mkdirs()
+        appDirectory.mkdirs();
+        //Crea archivo
+        File saveFilePath = new File(appDirectory, "dataejemplo.huff");
+
+        try {
+            FileOutputStream fos = new FileOutputStream(saveFilePath);
+            OutputStreamWriter file = new OutputStreamWriter(fos);
+            file.write(data.getBytes().toString());
+            file.flush();
+            file.close();
+            Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en "+ saveFilePath.getPath(), Toast.LENGTH_SHORT).show();
+        } catch (FileNotFoundException e) {
+            Log.i("ARCHIVO", e.toString());
+        } catch (IOException e) {
+            Log.i("ARCHIVO", e.toString());
+        }
     }
 }
