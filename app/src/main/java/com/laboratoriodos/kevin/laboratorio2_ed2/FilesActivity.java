@@ -15,30 +15,33 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
 
 public class FilesActivity extends AppCompatActivity {
 
     public final int PICK_CHOOSE_FILE = 1;
-    Button elegirArchivo;
+    public static int seleccion = 0;
+    Button btnElegirArchivo,btnCifrar;
     TextView contenido;
+
+    Huffman cifrado;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_files);
 
-        elegirArchivo = (Button) findViewById(R.id.btnElegirArchivo);
+        btnElegirArchivo = (Button) findViewById(R.id.btnElegirArchivo);
+        btnCifrar = (Button)findViewById(R.id.btnCifrar);
         contenido = (TextView) findViewById(R.id.textViewContenido);
 
-        elegirArchivo.setOnClickListener(view -> {
+        btnElegirArchivo.setOnClickListener(view -> {
 
             Boolean hasPermission =( ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED);
@@ -49,6 +52,25 @@ public class FilesActivity extends AppCompatActivity {
                 Log.e("MainActivity", "get permision-- already granted ");
                 subirArchivo();
             }
+        });
+
+        btnCifrar.setOnClickListener(view ->{
+            switch (seleccion){
+                case 1:
+                    cifrado = new Huffman(contenido.getText().toString());
+                    int[] caracteresContador = new int[256];
+                    for(char c: cifrado.getCadena().toCharArray()){
+                        caracteresContador[c]++;
+                    }
+                    contenido.setText(cifrado.cifrar(cifrado.arbolHuffman(caracteresContador),cifrado.getCadena()));
+                    crearArchivo();
+                    break;
+                case 2:
+                    //LZW
+                    break;
+            }
+
+
         });
     }
 
@@ -78,7 +100,7 @@ public class FilesActivity extends AppCompatActivity {
                 if (grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED){
                     subirArchivo();
                 }else {
-                    // show a msg to user
+                    Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -103,13 +125,31 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     private void subirArchivo() {
-        Intent subirArchivo = new Intent(Intent.ACTION_GET_CONTENT);
-        subirArchivo.setType("text/*");
-        subirArchivo.addCategory(Intent.CATEGORY_OPENABLE);
+        Intent subirArchivo = new Intent("com.sec.android.app.myfiles.PICK_DATA");
+        subirArchivo.putExtra("CONTENT_TYPE", "*/*");
+        subirArchivo.addCategory(Intent.CATEGORY_DEFAULT);
         try {
             startActivityForResult(Intent.createChooser(subirArchivo, "Seleccionar un archivo .txt"), PICK_CHOOSE_FILE);
         } catch (android.content.ActivityNotFoundException e) {
             Toast.makeText(getApplicationContext(), "Por favor seleccion un archivo correcto", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void crearArchivo(){
+        try {
+            File nuevaCarpeta = new File(Environment.getExternalStorageDirectory(), "CarpetaDePrueba");
+            if (!nuevaCarpeta.exists()) {
+                nuevaCarpeta.mkdir();
+            }
+            try {
+                File file = new File(nuevaCarpeta, "dataejemplo" + ".huff");
+                file.createNewFile();
+                FileOutputStream
+            } catch (Exception ex) {
+                Log.e("Error", "ex: " + ex);
+            }
+        } catch (Exception e) {
+            Log.e("Error", "e: " + e);
         }
     }
 }

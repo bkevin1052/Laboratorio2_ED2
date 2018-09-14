@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.widget.Button;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,10 +22,12 @@ public class MainActivity extends AppCompatActivity {
         btnMisCompresiones = (Button)findViewById(R.id.btnMisCompresiones);
 
         btnHuffman.setOnClickListener(view ->{
+            FilesActivity.seleccion = 1;
             startActivity(new Intent(getApplicationContext(), FilesActivity.class));
         });
 
         btnLZW.setOnClickListener(view ->{
+            FilesActivity.seleccion = 2;
             startActivity(new Intent(getApplicationContext(),FilesActivity.class));
         });
 
