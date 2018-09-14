@@ -1,5 +1,6 @@
 package com.laboratoriodos.kevin.laboratorio2_ed2;
 
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,6 +27,19 @@ public class ListFilesActivity extends AppCompatActivity {
         RecyclerViewMisCompresiones.setLayoutManager(new LinearLayoutManager(this));
         adapterMisCompresiones = new Adapter(this,listaArchivos);
         RecyclerViewMisCompresiones.setAdapter(adapterMisCompresiones);
+
+        adapterMisCompresiones.setOnClickListener(view ->
+        {
+            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+            dlgAlert.setMessage("Esta seguro en descomprimir el archivo?");
+            dlgAlert.setTitle("Descomprimir archivo");
+            dlgAlert.setPositiveButton("SI", (dialogInterface, i) -> {
+                //CORRER ALGORITMO DE DECODIFICACION
+            });
+            dlgAlert.setNegativeButton("NO", (dialogInterface, i) -> dialogInterface.cancel());
+            dlgAlert.setCancelable(true);
+            dlgAlert.create().show();
+        });
 
     }
 }

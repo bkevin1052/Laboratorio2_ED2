@@ -39,7 +39,13 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ProductoViewHolder> im
     public void onBindViewHolder(@NonNull ProductoViewHolder holder, int position) {
 
         Archivo archivo = listaArchivos.get(position);
-        holder.textViewFactorReduccion.setText("Hola que hace");
+        holder.textViewNombre.setText("Nombre: " + archivo.getNombre());
+        holder.textViewRuta.setText("Ruta:" + archivo.getRuta());
+        holder.textViewRazonCompresion.setText("Razon de compresion: " +String.valueOf(archivo.getRazonCompresion()));
+        holder.textViewFactorCompresion.setText("Factor de compresion: " +String.valueOf(archivo.getFactorCompresion()));
+        holder.textViewFactorReduccion.setText("Factor de reduccion: " +String.valueOf(archivo.getPorcentajeReduccion()) +"%");
+        holder.textViewAlgoritmo.setText("Algoritmo: " + archivo.getAlgoritmoDeCompresion());
+        holder.imageView.setImageResource(archivo.getImagen());
     }
 
     public void eliminar(List<Archivo> lista)
@@ -65,7 +71,12 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ProductoViewHolder> im
 
 
     class ProductoViewHolder extends RecyclerView.ViewHolder{
-        TextView textViewNombre, textViewRuta, textViewRazonCompresion,textViewFactorCompresion,textViewFactorReduccion;
+        TextView textViewNombre,
+                textViewRuta,
+                textViewRazonCompresion,
+                textViewFactorCompresion,
+                textViewFactorReduccion,
+                textViewAlgoritmo;
 
         ImageView imageView;
 
@@ -76,6 +87,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ProductoViewHolder> im
             textViewRazonCompresion = itemView.findViewById(R.id.txtRazonCompresion);
             textViewFactorCompresion = itemView.findViewById(R.id.txtFactorCompresion);
             textViewFactorReduccion = itemView.findViewById(R.id.txtFactorDeReduccion);
+            textViewAlgoritmo = itemView.findViewById(R.id.txtAlgoritmo);
             imageView = itemView.findViewById(R.id.imageView);
         }
 

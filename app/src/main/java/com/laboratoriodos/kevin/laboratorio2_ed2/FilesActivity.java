@@ -16,6 +16,8 @@ import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Archivo;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 
 public class FilesActivity extends AppCompatActivity {
 
@@ -35,6 +38,8 @@ public class FilesActivity extends AppCompatActivity {
     TextView contenido;
     Huffman cifrado;
     String data;
+    double bytesOriginal, bytesComprimido;
+    DecimalFormat df = new DecimalFormat("##.##");
 
 
     //METODOS
@@ -142,6 +147,9 @@ public class FilesActivity extends AppCompatActivity {
                 texto.append(" " + inputLine);
             }
             br.close();
+
+            bytesOriginal = texto.toString().getBytes().length;
+
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
         }
@@ -159,29 +167,52 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-    //FALTA
+    //FALTA SELECCION DE RUTA
     private void escrituraArchivo() {
 
-        //Obtiene ruta de sdcard
-        File pathToExternalStorage = Environment.getExternalStorageDirectory();
-        //agrega directorio /myFiles
-        File appDirectory = new File(pathToExternalStorage.getAbsolutePath() + "/Documents/");
-        //Si no existe la estructura, se crea usando mkdirs()
-        appDirectory.mkdirs();
-        //Crea archivo
-        File saveFilePath = new File(appDirectory, "dataejemplo.huff");
+        switch (seleccion) {
+            case 1:
+                //Obtiene ruta de sdcard
+                File pathToExternalStorage = Environment.getExternalStorageDirectory();
 
-        try {
-            FileOutputStream fos = new FileOutputStream(saveFilePath);
-            OutputStreamWriter file = new OutputStreamWriter(fos);
-            file.write(data.getBytes().toString());
-            file.flush();
-            file.close();
-            Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en "+ saveFilePath.getPath(), Toast.LENGTH_SHORT).show();
-        } catch (FileNotFoundException e) {
-            Log.i("ARCHIVO", e.toString());
-        } catch (IOException e) {
-            Log.i("ARCHIVO", e.toString());
+                //agrega directorio /Documents
+                File appDirectory = new File(pathToExternalStorage.getAbsolutePath() + "/Documents/");
+
+                //Si no existe la estructura, se crea usando mkdirs()
+                appDirectory.mkdirs();
+
+                //Crea archivo
+                File saveFilePath = new File(appDirectory, "dataejemplo.huff");
+
+                try {
+                    FileOutputStream fos = new FileOutputStream(saveFilePath);
+                    OutputStreamWriter file = new OutputStreamWriter(fos);
+                    file.write(data.getBytes().toString());
+                    file.flush();
+                    file.close();
+                    bytesComprimido = data.getBytes().toString().length();
+                    double razonCompresion, factorCompresion, porcentajeReduccion;
+                    razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
+                    factorCompresion = Double.parseDouble(df.format(bytesOriginal / bytesComprimido));
+                    porcentajeReduccion = Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100));
+                    Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + saveFilePath.getPath(), Toast.LENGTH_SHORT).show();
+                    ListFilesActivity.listaArchivos.add(new Archivo(
+                            saveFilePath.getName(),
+                            saveFilePath.getPath(),
+                            razonCompresion,
+                            factorCompresion,
+                            porcentajeReduccion,
+                            "HUFFMAN",
+                            R.drawable.iconolista));
+                } catch (FileNotFoundException e) {
+                    Log.i("ARCHIVO", e.toString());
+                } catch (IOException e) {
+                    Log.i("ARCHIVO", e.toString());
+                }
+                break;
+            case 2:
+                //LZW
+                break;
         }
     }
 }
