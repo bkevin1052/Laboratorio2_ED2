@@ -101,7 +101,12 @@ public class FilesActivity extends AppCompatActivity {
                                 .setType(StorageChooser.DIRECTORY_CHOOSER)
                                 .build();
                         chooser.show();
-                        chooser.setOnSelectListener(path -> escrituraArchivo(path));
+                        chooser.setOnSelectListener(path -> {
+                            escrituraArchivo(path);
+                            startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+                        });
+
+
                     }
                     break;
                 case 2:
@@ -175,7 +180,6 @@ public class FilesActivity extends AppCompatActivity {
 
     //FALTA SELECCION DE RUTA
     private void escrituraArchivo(String path) {
-
 
         switch (seleccion) {
             case 1:

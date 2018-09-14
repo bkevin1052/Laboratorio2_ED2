@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -42,10 +43,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnMisCompresiones.setOnClickListener(view ->{
-            if(ListFilesActivity.listaArchivos.size() != 0) {
-                cargarDatos();
+            if(ListFilesActivity.listaArchivos.size() == 0) {
+
+                try{
+                    cargarDatos();
+                }catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "No hay archivos comprimidos aun", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(getApplicationContext(), ListFilesActivity.class));
+                }
             }
-            startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+            else
+            {
+
+                startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+
+            }
         });
     }
 
