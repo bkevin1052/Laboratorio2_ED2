@@ -7,13 +7,17 @@ public class Archivo {
     private double razonCompresion;
     private double factorCompresion;
     private double porcentajeReduccion;
+    private String algoritmoDeCompresion;
+    private int imagen;
 
-    public Archivo(String nombre, String ruta, double razonCompresion, double factorCompresion, double porcentajeReduccion) {
+    public Archivo(String nombre, String ruta, double razonCompresion, double factorCompresion, double porcentajeReduccion,String algoritmoDeCompresion,int imagen) {
         this.nombre = nombre;
         this.ruta = ruta;
         this.razonCompresion = razonCompresion;
         this.factorCompresion = factorCompresion;
         this.porcentajeReduccion = porcentajeReduccion;
+        this.algoritmoDeCompresion = algoritmoDeCompresion;
+        this.imagen = imagen;
     }
 
     public String getNombre() {
@@ -54,5 +58,21 @@ public class Archivo {
 
     public void setPorcentajeReduccion(double porcentajeReduccion) {
         this.porcentajeReduccion = porcentajeReduccion;
+    }
+
+    public String getAlgoritmoDeCompresion() {
+        return algoritmoDeCompresion;
+    }
+
+    public void setAlgoritmoDeCompresion(String algoritmoDeCompresion) {
+        this.algoritmoDeCompresion = algoritmoDeCompresion;
+    }
+
+    public int getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(int imagen) {
+        this.imagen = imagen;
     }
 }

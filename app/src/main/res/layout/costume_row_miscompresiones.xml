@@ -13,12 +13,13 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:padding="8dp"
+            android:background="#83210B">
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="83dp"
-                android:layout_height="90dp"
+                android:layout_width="105dp"
+                android:layout_height="109dp"
                 android:padding="4dp" />
 
             <TextView
@@ -28,7 +29,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginEnd="6dp"
-                android:background="@color/colorPrimary"
+                android:background="#F85A37"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="Nombre del archivo"
@@ -43,7 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/txtNombreArchivo"
                 android:layout_below="@+id/txtNombreArchivo"
-                android:background="@color/colorPrimary"
+                android:background="#9E270D  "
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="Ruta"
@@ -57,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/txtRuta"
                 android:layout_below="@+id/txtRuta"
-                android:background="@color/colorPrimary"
+                android:background="#B92C0D"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="Razon de compresion"
@@ -71,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/txtRuta"
                 android:layout_below="@+id/txtRazonCompresion"
-                android:background="@color/colorPrimary"
+                android:background="#CB3110"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="Factor de compresion"
@@ -85,10 +86,24 @@
                 android:layout_height="wrap_content"
                 android:layout_alignStart="@+id/txtRuta"
                 android:layout_below="@+id/txtFactorCompresion"
-                android:background="@color/colorPrimary"
+                android:background="#E03814"
                 android:paddingLeft="15dp"
                 android:paddingRight="15dp"
                 android:text="Factor de Reduccion"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtAlgoritmo"
+                android:layout_width="238dp"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/txtRuta"
+                android:layout_below="@+id/txtFactorDeReduccion"
+                android:background="#E84A28"
+                android:paddingLeft="15dp"
+                android:paddingRight="15dp"
+                android:text="Algoritmo"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Small.Inverse"
                 android:textColor="#FFFFFF"
                 android:textStyle="bold" />

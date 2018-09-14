@@ -1,22 +1,25 @@
 package com.laboratoriodos.kevin.laboratorio2_ed2;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.codekidlabs.storagechooser.StorageChooser;
+import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Archivo;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,16 +28,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.text.DecimalFormat;
 
 public class FilesActivity extends AppCompatActivity {
 
     //VARIABLES
     public final int PICK_CHOOSE_FILE = 1;
+    public final int PICK_FOLDER = 2;
     public static int seleccion = 0;
     Button btnElegirArchivo, btnComprimir;
     TextView contenido;
     Huffman cifrado;
     String data;
+    double bytesOriginal, bytesComprimido;
+    DecimalFormat df = new DecimalFormat("##.##");
 
 
     //METODOS
@@ -42,11 +49,16 @@ public class FilesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_files);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //ASIGNACION ID
         btnElegirArchivo = (Button) findViewById(R.id.btnElegirArchivo);
         btnComprimir = (Button) findViewById(R.id.btnComprimir);
         contenido = (TextView) findViewById(R.id.textViewContenido);
+        btnComprimir.setVisibility(View.INVISIBLE);
 
+        //botones y textviews
         contenido.setMovementMethod(new ScrollingMovementMethod());
 
         btnElegirArchivo.setOnClickListener(view -> {
@@ -81,7 +93,15 @@ public class FilesActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
                     } else {
                         Log.e("MainActivity", "get permision-- already granted ");
-                        escrituraArchivo();
+                        StorageChooser chooser = new StorageChooser.Builder()
+                                .withActivity(FilesActivity.this)
+                                .withFragmentManager(getFragmentManager())
+                                .withMemoryBar(true)
+                                .allowCustomPath(true)
+                                .setType(StorageChooser.DIRECTORY_CHOOSER)
+                                .build();
+                        chooser.show();
+                        chooser.setOnSelectListener(path -> escrituraArchivo(path));
                     }
                     break;
                 case 2:
@@ -120,14 +140,6 @@ public class FilesActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
                 }
             }
-
-            case 2: {
-                if (grantResults.length > 0 && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    escrituraArchivo();
-                } else {
-                    Toast.makeText(getApplicationContext(), "ERROR AL CREAR EL ARCHIVO", Toast.LENGTH_SHORT).show();
-                }
-            }
         }
     }
 
@@ -142,6 +154,8 @@ public class FilesActivity extends AppCompatActivity {
                 texto.append(" " + inputLine);
             }
             br.close();
+            bytesOriginal = texto.toString().getBytes().length;
+            btnComprimir.setVisibility(View.VISIBLE);
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
         }
@@ -159,29 +173,42 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-    //FALTA
-    private void escrituraArchivo() {
+    //FALTA SELECCION DE RUTA
+    private void escrituraArchivo(String path) {
 
-        //Obtiene ruta de sdcard
-        File pathToExternalStorage = Environment.getExternalStorageDirectory();
-        //agrega directorio /myFiles
-        File appDirectory = new File(pathToExternalStorage.getAbsolutePath() + "/Documents/");
-        //Si no existe la estructura, se crea usando mkdirs()
-        appDirectory.mkdirs();
-        //Crea archivo
-        File saveFilePath = new File(appDirectory, "dataejemplo.huff");
 
-        try {
-            FileOutputStream fos = new FileOutputStream(saveFilePath);
-            OutputStreamWriter file = new OutputStreamWriter(fos);
-            file.write(data.getBytes().toString());
-            file.flush();
-            file.close();
-            Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en "+ saveFilePath.getPath(), Toast.LENGTH_SHORT).show();
-        } catch (FileNotFoundException e) {
-            Log.i("ARCHIVO", e.toString());
-        } catch (IOException e) {
-            Log.i("ARCHIVO", e.toString());
+        switch (seleccion) {
+            case 1:
+                try {
+                    File f = new File(path, "dataejemplo.huff");
+                    FileOutputStream fos = new FileOutputStream(f);
+                    OutputStreamWriter file = new OutputStreamWriter(fos);
+                    file.write(data.getBytes().toString());
+                    file.flush();
+                    file.close();
+                    bytesComprimido = data.getBytes().toString().length();
+                    double razonCompresion, factorCompresion, porcentajeReduccion;
+                    razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
+                    factorCompresion = Double.parseDouble(df.format(bytesOriginal / bytesComprimido));
+                    porcentajeReduccion = Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100));
+                    Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
+                    ListFilesActivity.listaArchivos.add(new Archivo(
+                            path,
+                            path,
+                            razonCompresion,
+                            factorCompresion,
+                            porcentajeReduccion,
+                            "HUFFMAN",
+                            R.drawable.iconolista));
+                } catch (FileNotFoundException e) {
+                    Log.i("ARCHIVO", e.toString());
+                } catch (IOException e) {
+                    Log.i("ARCHIVO", e.toString());
+                }
+                break;
+            case 2:
+                //LZW
+                break;
         }
     }
 }
