@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -17,6 +16,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.codekidlabs.storagechooser.StorageChooser;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Archivo;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
 
@@ -34,6 +34,7 @@ public class FilesActivity extends AppCompatActivity {
 
     //VARIABLES
     public final int PICK_CHOOSE_FILE = 1;
+    public final int PICK_FOLDER = 2;
     public static int seleccion = 0;
     Button btnElegirArchivo, btnComprimir;
     TextView contenido;
@@ -55,7 +56,6 @@ public class FilesActivity extends AppCompatActivity {
         btnElegirArchivo = (Button) findViewById(R.id.btnElegirArchivo);
         btnComprimir = (Button) findViewById(R.id.btnComprimir);
         contenido = (TextView) findViewById(R.id.textViewContenido);
-
         btnComprimir.setVisibility(View.INVISIBLE);
 
         //botones y textviews
@@ -93,9 +93,15 @@ public class FilesActivity extends AppCompatActivity {
                         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
                     } else {
                         Log.e("MainActivity", "get permision-- already granted ");
-                        escrituraArchivo();
-                        finish();
-                        startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+                        StorageChooser chooser = new StorageChooser.Builder()
+                                .withActivity(FilesActivity.this)
+                                .withFragmentManager(getFragmentManager())
+                                .withMemoryBar(true)
+                                .allowCustomPath(true)
+                                .setType(StorageChooser.DIRECTORY_CHOOSER)
+                                .build();
+                        chooser.show();
+                        chooser.setOnSelectListener(path -> escrituraArchivo(path));
                     }
                     break;
                 case 2:
@@ -134,14 +140,6 @@ public class FilesActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
                 }
             }
-
-            case 2: {
-                if (grantResults.length > 0 && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                    escrituraArchivo();
-                } else {
-                    Toast.makeText(getApplicationContext(), "ERROR AL CREAR EL ARCHIVO", Toast.LENGTH_SHORT).show();
-                }
-            }
         }
     }
 
@@ -176,24 +174,14 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     //FALTA SELECCION DE RUTA
-    private void escrituraArchivo() {
+    private void escrituraArchivo(String path) {
+
 
         switch (seleccion) {
             case 1:
-                //Obtiene ruta de sdcard
-                File pathToExternalStorage = Environment.getExternalStorageDirectory();
-
-                //agrega directorio /Documents
-                File appDirectory = new File(pathToExternalStorage.getAbsolutePath() + "/Documents/");
-
-                //Si no existe la estructura, se crea usando mkdirs()
-                appDirectory.mkdirs();
-
-                //Crea archivo
-                File saveFilePath = new File(appDirectory, "dataejemplo.huff");
-
                 try {
-                    FileOutputStream fos = new FileOutputStream(saveFilePath);
+                    File f = new File(path, "dataejemplo.huff");
+                    FileOutputStream fos = new FileOutputStream(f);
                     OutputStreamWriter file = new OutputStreamWriter(fos);
                     file.write(data.getBytes().toString());
                     file.flush();
@@ -203,10 +191,10 @@ public class FilesActivity extends AppCompatActivity {
                     razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
                     factorCompresion = Double.parseDouble(df.format(bytesOriginal / bytesComprimido));
                     porcentajeReduccion = Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100));
-                    Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + saveFilePath.getPath(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
                     ListFilesActivity.listaArchivos.add(new Archivo(
-                            saveFilePath.getName(),
-                            saveFilePath.getPath(),
+                            path,
+                            path,
                             razonCompresion,
                             factorCompresion,
                             porcentajeReduccion,

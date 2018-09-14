@@ -1,18 +1,24 @@
 package com.laboratoriodos.kevin.laboratorio2_ed2;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Archivo;
-import com.laboratoriodos.kevin.laboratorio2_ed2.clases.PreferenceManager;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     Button btnHuffman, btnLZW,btnMisCompresiones;
 
-    private PreferenceManager configuracion;
+    private static final String PREFS_TAG = "SharedPrefs";
+    private static final String ARCHIVO_TAG = "Archivo";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +28,8 @@ public class MainActivity extends AppCompatActivity {
         btnHuffman = (Button)findViewById(R.id.btnHuffman);
         btnLZW = (Button)findViewById(R.id.btnLzw);
         btnMisCompresiones = (Button)findViewById(R.id.btnMisCompresiones);
-        configuracion = new PreferenceManager(getApplicationContext());
+
+
 
         btnHuffman.setOnClickListener(view ->{
             FilesActivity.seleccion = 1;
@@ -35,39 +42,21 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnMisCompresiones.setOnClickListener(view ->{
-
-            if(ListFilesActivity.listaArchivos.size() != 0){
-                guardarDatos();
-            }
-            else{
-                agregarDatos();
+            if(ListFilesActivity.listaArchivos.size() != 0) {
+                cargarDatos();
             }
             startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
         });
     }
 
-    private void guardarDatos(){
 
-        if(ListFilesActivity.listaArchivos != null) {
-            for (Archivo archivo : ListFilesActivity.listaArchivos) {
-                configuracion.setNombre(archivo.getNombre());
-                configuracion.setRuta(archivo.getRuta());
-                configuracion.setRazonCompresion(String.valueOf(archivo.getRazonCompresion()));
-                configuracion.setFactorCompresion(String.valueOf(archivo.getFactorCompresion()));
-                configuracion.setPorcentajeReduccion(String.valueOf(archivo.getPorcentajeReduccion()));
-                configuracion.setAlgoritmoCompresion(archivo.getNombre());
-                configuracion.setImagen(String.valueOf(archivo.getImagen()));
-            }
-        }
+    private void cargarDatos(){
+            SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("lista archivos", null);
+            Type type = new TypeToken<ArrayList<Archivo>>() {
+            }.getType();
+            ListFilesActivity.listaArchivos = gson.fromJson(json, type);
     }
 
-    private void agregarDatos(){
-        ListFilesActivity.listaArchivos.add(new Archivo(configuracion.getNombre(),
-                configuracion.getRuta(),
-                Double.parseDouble(configuracion.getRazonCompresion()),
-                Double.parseDouble(configuracion.getFactorCompresion()),
-                Double.parseDouble(configuracion.getPorcentajeReduccion()),
-                configuracion.getAlgoritmoCompresion(),
-                Integer.parseInt(configuracion.getImagen())));
-    }
 }
