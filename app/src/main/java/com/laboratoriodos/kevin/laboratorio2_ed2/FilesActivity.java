@@ -1,6 +1,7 @@
 package com.laboratoriodos.kevin.laboratorio2_ed2;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 public class FilesActivity extends AppCompatActivity {
 
@@ -29,7 +31,7 @@ public class FilesActivity extends AppCompatActivity {
     public static int seleccion = 0;
     Button btnElegirArchivo,btnCifrar;
     TextView contenido;
-
+    Uri uriG;
     Huffman cifrado;
 
     @Override
@@ -63,7 +65,8 @@ public class FilesActivity extends AppCompatActivity {
                         caracteresContador[c]++;
                     }
                     contenido.setText(cifrado.cifrar(cifrado.arbolHuffman(caracteresContador),cifrado.getCadena()));
-                    crearArchivo();
+                    escrituraArchivo();
+                    Toast.makeText(getApplicationContext(),"Compresion realizada correctamente",Toast.LENGTH_SHORT).show();
                     break;
                 case 2:
                     //LZW
@@ -107,7 +110,7 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     private String lecturaArchivo(Uri uri){
-
+        uriG = uri;
         StringBuilder texto = new StringBuilder();
         try{
             InputStream f = getContentResolver().openInputStream(uri);
@@ -135,21 +138,17 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-    private void crearArchivo(){
-        try {
-            File nuevaCarpeta = new File(Environment.getExternalStorageDirectory(), "CarpetaDePrueba");
-            if (!nuevaCarpeta.exists()) {
-                nuevaCarpeta.mkdir();
-            }
+
+    //FALTA
+    private void escrituraArchivo(){
+
             try {
-                File file = new File(nuevaCarpeta, "dataejemplo" + ".huff");
-                file.createNewFile();
-                FileOutputStream
+                File file = new File(getApplicationContext().getFilesDir(), "dataejemplo.huff");
+                FileOutputStream f = openFileOutput(file.getName(), Context.MODE_APPEND);
+                f.write(contenido.getText().toString().getBytes());
+                f.close();
             } catch (Exception ex) {
                 Log.e("Error", "ex: " + ex);
             }
-        } catch (Exception e) {
-            Log.e("Error", "e: " + e);
-        }
     }
 }
