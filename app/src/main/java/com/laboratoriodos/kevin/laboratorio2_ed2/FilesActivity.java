@@ -85,14 +85,7 @@ public class FilesActivity extends AppCompatActivity {
                     }
                     data = cifrado.cifrar(cifrado.arbolHuffman(caracteresContador), cifrado.getCadena());
                     contenido.setText(data);
-                    //VERIFICAR PERMISOS
-                    Boolean hasPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_GRANTED);
-                    if (!hasPermission) {
-                        Log.e("MainActivity", "get permision   ");
-                        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
-                    } else {
-                        Log.e("MainActivity", "get permision-- already granted ");
+
                         StorageChooser chooser = new StorageChooser.Builder()
                                 .withActivity(FilesActivity.this)
                                 .withFragmentManager(getFragmentManager())
@@ -103,11 +96,9 @@ public class FilesActivity extends AppCompatActivity {
                         chooser.show();
                         chooser.setOnSelectListener(path -> {
                             escrituraArchivo(path);
+                            finish();
                             startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
                         });
-
-
-                    }
                     break;
                 case 2:
                     //LZW
