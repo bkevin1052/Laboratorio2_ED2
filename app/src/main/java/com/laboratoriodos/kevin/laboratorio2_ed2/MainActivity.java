@@ -17,9 +17,6 @@ public class MainActivity extends AppCompatActivity {
 
     public Button btnHuffman, btnLZW,btnMisCompresiones;
 
-    private static final String PREFS_TAG = "SharedPrefs";
-    private static final String ARCHIVO_TAG = "Archivo";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

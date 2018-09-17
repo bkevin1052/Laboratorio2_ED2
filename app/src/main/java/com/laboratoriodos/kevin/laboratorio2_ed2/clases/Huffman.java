@@ -1,11 +1,10 @@
 package com.laboratoriodos.kevin.laboratorio2_ed2.clases;
 
-import java.util.ArrayList;
-import java.util.PriorityQueue;
-
 import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Arbol;
 import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Hoja;
 import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Nodo;
+
+import java.util.PriorityQueue;
 
 public class Huffman {
 

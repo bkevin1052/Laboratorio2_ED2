@@ -36,12 +36,14 @@ public class FilesActivity extends AppCompatActivity {
     public final int PICK_CHOOSE_FILE = 1;
     public final int PICK_FOLDER = 2;
     public static int seleccion = 0;
+    public static String ruta;
     Button btnElegirArchivo, btnComprimir;
     TextView contenido;
     Huffman cifrado;
     String data;
     double bytesOriginal, bytesComprimido;
     DecimalFormat df = new DecimalFormat("##.##");
+    int[] caracteresContador;
 
 
     //METODOS
@@ -79,7 +81,7 @@ public class FilesActivity extends AppCompatActivity {
             switch (seleccion) {
                 case 1:
                     cifrado = new Huffman(contenido.getText().toString());
-                    int[] caracteresContador = new int[256];
+                    caracteresContador = new int[256];
                     for (char c : cifrado.getCadena().toCharArray()) {
                         caracteresContador[c]++;
                     }
@@ -176,11 +178,14 @@ public class FilesActivity extends AppCompatActivity {
             case 1:
                 try {
                     File f = new File(path, "dataejemplo.huff");
+                    ruta = f.getPath();
+
                     FileOutputStream fos = new FileOutputStream(f);
                     OutputStreamWriter file = new OutputStreamWriter(fos);
                     file.write(data.getBytes().toString());
                     file.flush();
                     file.close();
+                    //obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
                     bytesComprimido = data.getBytes().toString().length();
                     double razonCompresion, factorCompresion, porcentajeReduccion;
                     razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
@@ -206,4 +211,30 @@ public class FilesActivity extends AppCompatActivity {
                 break;
         }
     }
+
+
+//    public void obtenerFrecuencias(Arbol arbol, StringBuffer prefijo) {
+//        try {
+//            if (arbol instanceof Hoja) {
+//                Hoja hoja = (Hoja) arbol;//casting
+//                //ESCRIBIR DATOS
+//                FileWriter f = new FileWriter(FilesActivity.ruta,true);
+//                BufferedWriter bw = new BufferedWriter(f);
+//                bw.write("\n"+hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
+//                bw.close();
+//
+//
+//            } else if (arbol instanceof Nodo) {
+//                Nodo nodo = (Nodo) arbol;
+//                prefijo.append('0');
+//                obtenerFrecuencias(nodo.izquierda, prefijo);
+//                prefijo.deleteCharAt(prefijo.length() - 1);
+//                prefijo.append('1');
+//                obtenerFrecuencias(nodo.derecha, prefijo);
+//                prefijo.deleteCharAt(prefijo.length() - 1);
+//            }
+//        }catch (Exception e){
+//            //mensaje de error
+//        }
+//    }
 }
