@@ -41,6 +41,7 @@ public class FilesActivity extends AppCompatActivity {
     TextView contenido;
     Huffman cifrado;
     String data;
+    Uri uriName;
     double bytesOriginal, bytesComprimido;
     DecimalFormat df = new DecimalFormat("##.##");
     int[] caracteresContador;
@@ -118,6 +119,7 @@ public class FilesActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     if (data != null) {
                         Uri uri = data.getData();
+                        uriName = uri;
                         contenido.setText(lecturaArchivo(uri));
                     } else {
                         Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
@@ -177,8 +179,14 @@ public class FilesActivity extends AppCompatActivity {
         switch (seleccion) {
             case 1:
                 try {
-                    File f = new File(path, "dataejemplo.huff");
+
+
+                    File f = new File(path, "dataComprimida.huff");
                     ruta = f.getPath();
+
+                    if(!f.exists()){
+                        f.createNewFile();
+                    }
 
                     FileOutputStream fos = new FileOutputStream(f);
                     OutputStreamWriter file = new OutputStreamWriter(fos);
@@ -193,7 +201,7 @@ public class FilesActivity extends AppCompatActivity {
                     porcentajeReduccion = Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100));
                     Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
                     ListFilesActivity.listaArchivos.add(new Archivo(
-                            path,
+                            "dataComprimida.huff",
                             path,
                             razonCompresion,
                             factorCompresion,
