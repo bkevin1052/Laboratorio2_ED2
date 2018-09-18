@@ -37,14 +37,20 @@ public class FilesActivity extends AppCompatActivity {
     public final int PICK_FOLDER = 2;
     public static int seleccion = 0;
     public static String ruta;
-    Button btnElegirArchivo, btnComprimir;
-    TextView contenido;
-    Huffman cifrado;
     String data;
     Uri uriName;
     double bytesOriginal, bytesComprimido;
     DecimalFormat df = new DecimalFormat("##.##");
     int[] caracteresContador;
+    StringBuilder texto = new StringBuilder();
+
+
+    //OBJETOS
+    Button btnElegirArchivo, btnComprimir;
+    TextView contenido;
+
+    //POO
+    Huffman cifrado;
 
 
     //METODOS
@@ -81,14 +87,13 @@ public class FilesActivity extends AppCompatActivity {
         btnComprimir.setOnClickListener(view -> {
             switch (seleccion) {
                 case 1:
-                    cifrado = new Huffman(contenido.getText().toString());
+                    cifrado = new Huffman(texto.toString());
                     caracteresContador = new int[256];
                     for (char c : cifrado.getCadena().toCharArray()) {
                         caracteresContador[c]++;
                     }
-                    data = cifrado.cifrar(cifrado.arbolHuffman(caracteresContador), cifrado.getCadena());
+                    data = cifrado.cifrar(cifrado.arbolHuffman(caracteresContador), texto.toString());
                     contenido.setText(data);
-
                         StorageChooser chooser = new StorageChooser.Builder()
                                 .withActivity(FilesActivity.this)
                                 .withFragmentManager(getFragmentManager())
@@ -144,7 +149,7 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     private String lecturaArchivo(Uri uri) {
-        StringBuilder texto = new StringBuilder();
+
         try {
             InputStream f = getContentResolver().openInputStream(uri);
             BufferedReader br = new BufferedReader(new InputStreamReader(f));
