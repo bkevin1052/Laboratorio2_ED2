@@ -19,16 +19,23 @@ import android.widget.Toast;
 import com.codekidlabs.storagechooser.StorageChooser;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Archivo;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
+import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Arbol;
+import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Hoja;
+import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Nodo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.DecimalFormat;
+import java.util.Random;
 
 public class FilesActivity extends AppCompatActivity {
 
@@ -37,7 +44,7 @@ public class FilesActivity extends AppCompatActivity {
     public final int PICK_FOLDER = 2;
     public static int seleccion = 0;
     public static String ruta;
-    String data;
+    public static String data;
     Uri uriName;
     double bytesOriginal, bytesComprimido;
     DecimalFormat df = new DecimalFormat("##.##");
@@ -50,7 +57,8 @@ public class FilesActivity extends AppCompatActivity {
     TextView contenido;
 
     //POO
-    Huffman cifrado;
+    public static Huffman cifrado;
+    public Arbol arbol;
 
 
     //METODOS
@@ -92,7 +100,8 @@ public class FilesActivity extends AppCompatActivity {
                     for (char c : cifrado.getCadena().toCharArray()) {
                         caracteresContador[c]++;
                     }
-                    data = cifrado.cifrar(cifrado.arbolHuffman(caracteresContador), texto.toString());
+                    arbol = cifrado.arbolHuffman(caracteresContador);
+                    data = cifrado.cifrar(arbol, texto.toString());
                     contenido.setText(data);
                         StorageChooser chooser = new StorageChooser.Builder()
                                 .withActivity(FilesActivity.this)
@@ -103,9 +112,17 @@ public class FilesActivity extends AppCompatActivity {
                                 .build();
                         chooser.show();
                         chooser.setOnSelectListener(path -> {
-                            escrituraArchivo(path);
-                            finish();
-                            startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+                            Boolean hasPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                    == PackageManager.PERMISSION_GRANTED);
+                            if (!hasPermission) {
+                                Log.e("MainActivity", "get permision   ");
+                                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                            } else {
+                                Log.e("MainActivity", "get permision-- already granted ");
+                                escrituraArchivo(path);
+                                finish();
+                                startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+                            }
                         });
                     break;
                 case 2:
@@ -116,23 +133,6 @@ public class FilesActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case PICK_CHOOSE_FILE:
-                if (resultCode == RESULT_OK) {
-                    if (data != null) {
-                        Uri uri = data.getData();
-                        uriName = uri;
-                        contenido.setText(lecturaArchivo(uri));
-                    } else {
-                        Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
-                    }
-                }
-                break;
-        }
-    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -145,13 +145,18 @@ public class FilesActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "ERROR AL LEER EL ARCHIVO", Toast.LENGTH_SHORT).show();
                 }
             }
+            case 2:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
+                    Toast.makeText(getApplicationContext(), "ERROR AL ESCRIBIR ARCHIVO", Toast.LENGTH_SHORT).show();
+                }
         }
     }
 
-    private String lecturaArchivo(Uri uri) {
+    private String lecturaArchivo(String path) {
 
         try {
-            InputStream f = getContentResolver().openInputStream(uri);
+            InputStream f = new FileInputStream(path);
             BufferedReader br = new BufferedReader(new InputStreamReader(f));
             String inputLine;
 
@@ -168,34 +173,35 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     private void subirArchivo() {
-        Intent subirArchivo = new Intent("com.sec.android.app.myfiles.PICK_DATA");
-        subirArchivo.putExtra("CONTENT_TYPE", "*/*");
-        subirArchivo.addCategory(Intent.CATEGORY_DEFAULT);
-        try {
-            startActivityForResult(Intent.createChooser(subirArchivo, "Seleccionar un archivo .txt"), PICK_CHOOSE_FILE);
-        } catch (android.content.ActivityNotFoundException e) {
-            Toast.makeText(getApplicationContext(), "Por favor seleccion un archivo correcto", Toast.LENGTH_SHORT).show();
-        }
+        StorageChooser chooser = new StorageChooser.Builder()
+                .withActivity(FilesActivity.this)
+                .withFragmentManager(getFragmentManager())
+                .withMemoryBar(true)
+                .allowCustomPath(true)
+                .setType(StorageChooser.FILE_PICKER)
+                .build();
+        chooser.show();
+        chooser.setOnSelectListener(path -> {
+            contenido.setText(lecturaArchivo(path));
+        });
     }
 
-    //FALTA SELECCION DE RUTA
     private void escrituraArchivo(String path) {
 
         switch (seleccion) {
             case 1:
+                Random r = new Random();
+                int h = r.nextInt(100);
+                String name = "dataComprimida"+h+".huff";
                 try {
 
-
-                    File f = new File(path, "dataComprimida.huff");
-                    ruta = f.getPath();
-
-                    if(!f.exists()){
+                    File f = new File(path, name);
+                    if(!f.exists()) {
                         f.createNewFile();
                     }
-
                     FileOutputStream fos = new FileOutputStream(f);
                     OutputStreamWriter file = new OutputStreamWriter(fos);
-                    file.write(data.getBytes().toString());
+                    file.append(data.toString());
                     file.flush();
                     file.close();
                     //obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
@@ -206,13 +212,14 @@ public class FilesActivity extends AppCompatActivity {
                     porcentajeReduccion = Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100));
                     Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
                     ListFilesActivity.listaArchivos.add(new Archivo(
-                            "dataComprimida.huff",
+                            name,
                             path,
                             razonCompresion,
                             factorCompresion,
                             porcentajeReduccion,
                             "HUFFMAN",
-                            R.drawable.iconolista));
+                            R.drawable.iconolista,
+                            arbol));
                 } catch (FileNotFoundException e) {
                     Log.i("ARCHIVO", e.toString());
                 } catch (IOException e) {
@@ -225,29 +232,28 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
+    public void obtenerFrecuencias(Arbol arbol, StringBuffer prefijo) {
+        try {
+            if (arbol instanceof Hoja) {
+                Hoja hoja = (Hoja) arbol;//casting
+                //ESCRIBIR DATOS
+                FileWriter f = new FileWriter(FilesActivity.ruta,true);
+                BufferedWriter bw = new BufferedWriter(f);
+                bw.write("\n"+hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
+                bw.close();
 
-//    public void obtenerFrecuencias(Arbol arbol, StringBuffer prefijo) {
-//        try {
-//            if (arbol instanceof Hoja) {
-//                Hoja hoja = (Hoja) arbol;//casting
-//                //ESCRIBIR DATOS
-//                FileWriter f = new FileWriter(FilesActivity.ruta,true);
-//                BufferedWriter bw = new BufferedWriter(f);
-//                bw.write("\n"+hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
-//                bw.close();
-//
-//
-//            } else if (arbol instanceof Nodo) {
-//                Nodo nodo = (Nodo) arbol;
-//                prefijo.append('0');
-//                obtenerFrecuencias(nodo.izquierda, prefijo);
-//                prefijo.deleteCharAt(prefijo.length() - 1);
-//                prefijo.append('1');
-//                obtenerFrecuencias(nodo.derecha, prefijo);
-//                prefijo.deleteCharAt(prefijo.length() - 1);
-//            }
-//        }catch (Exception e){
-//            //mensaje de error
-//        }
-//    }
+
+            } else if (arbol instanceof Nodo) {
+                Nodo nodo = (Nodo) arbol;
+                prefijo.append('0');
+                obtenerFrecuencias(nodo.izquierda, prefijo);
+                prefijo.deleteCharAt(prefijo.length() - 1);
+               prefijo.append('1');
+                obtenerFrecuencias(nodo.derecha, prefijo);
+                prefijo.deleteCharAt(prefijo.length() - 1);
+            }
+        }catch (Exception e){
+            //mensaje de error
+       }
+    }
 }

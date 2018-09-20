@@ -53,7 +53,7 @@ public class Huffman {
     }
 
 
-    public String decodificar(Arbol arbol, String decodificar) {
+    public String decifrar(Arbol arbol, String decodificar) {
 
         String decodificarTexto="";
         Nodo nodo = (Nodo)arbol;

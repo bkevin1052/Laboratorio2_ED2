@@ -1,5 +1,7 @@
 package com.laboratoriodos.kevin.laboratorio2_ed2.clases;
 
+import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Arbol;
+
 public class Archivo {
 
     private String nombre;
@@ -9,8 +11,9 @@ public class Archivo {
     private double porcentajeReduccion;
     private String algoritmoDeCompresion;
     private int imagen;
+    private Arbol arbol;
 
-    public Archivo(String nombre, String ruta, double razonCompresion, double factorCompresion, double porcentajeReduccion,String algoritmoDeCompresion,int imagen) {
+    public Archivo(String nombre, String ruta, double razonCompresion, double factorCompresion, double porcentajeReduccion,String algoritmoDeCompresion,int imagen,Arbol arbol) {
         this.nombre = nombre;
         this.ruta = ruta;
         this.razonCompresion = razonCompresion;
@@ -18,6 +21,15 @@ public class Archivo {
         this.porcentajeReduccion = porcentajeReduccion;
         this.algoritmoDeCompresion = algoritmoDeCompresion;
         this.imagen = imagen;
+        this.arbol = arbol;
+    }
+
+    public Arbol getArbol() {
+        return arbol;
+    }
+
+    public void setArbol(Arbol arbol) {
+        this.arbol = arbol;
     }
 
     public String getNombre() {
