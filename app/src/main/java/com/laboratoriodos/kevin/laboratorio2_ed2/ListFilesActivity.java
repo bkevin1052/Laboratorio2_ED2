@@ -29,8 +29,8 @@ import java.util.Random;
 
 public class ListFilesActivity extends AppCompatActivity {
 
-    RecyclerView RecyclerViewMisCompresiones;
-    Adapter adapterMisCompresiones;
+    public static RecyclerView RecyclerViewMisCompresiones;
+    public static Adapter adapterMisCompresiones;
     public static List<Archivo> listaArchivos = new LinkedList<>();
 
     @Override
@@ -54,7 +54,7 @@ public class ListFilesActivity extends AppCompatActivity {
             dlgAlert.setPositiveButton("SI", (dialogInterface, i) -> {
                         Archivo archivoSeleccionado = listaArchivos.get(RecyclerViewMisCompresiones.getChildAdapterPosition(view));
                         String binario = lecturaDescompresion(archivoSeleccionado.getRuta() + "/" + archivoSeleccionado.getNombre());
-                        String descifrado = FilesActivity.cifrado.decifrar(archivoSeleccionado.getArbol(), binario);
+                        String descifrado = FilesActivity.cifrado.decifrar(FilesActivity.arbol, binario);
                         StorageChooser chooser = new StorageChooser.Builder()
                                 .withActivity(ListFilesActivity.this)
                                 .withFragmentManager(getFragmentManager())

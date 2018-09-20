@@ -58,7 +58,7 @@ public class FilesActivity extends AppCompatActivity {
 
     //POO
     public static Huffman cifrado;
-    public Arbol arbol;
+    public static Arbol arbol;
 
 
     //METODOS
@@ -153,7 +153,7 @@ public class FilesActivity extends AppCompatActivity {
         }
     }
 
-    private String lecturaArchivo(String path) {
+    public String lecturaArchivo(String path) {
 
         try {
             InputStream f = new FileInputStream(path);
@@ -204,7 +204,7 @@ public class FilesActivity extends AppCompatActivity {
                     file.append(data.toString());
                     file.flush();
                     file.close();
-                    ruta = path;
+                    ruta = path+"/"+name;
                     obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
                     bytesComprimido = data.getBytes().toString().length();
                     double razonCompresion, factorCompresion, porcentajeReduccion;
@@ -219,8 +219,7 @@ public class FilesActivity extends AppCompatActivity {
                             factorCompresion,
                             porcentajeReduccion,
                             "HUFFMAN",
-                            R.drawable.iconolista,
-                            arbol));
+                            R.drawable.iconolista));
                 } catch (FileNotFoundException e) {
                     Log.i("ARCHIVO", e.toString());
                 } catch (IOException e) {
@@ -238,10 +237,10 @@ public class FilesActivity extends AppCompatActivity {
             if (arbol instanceof Hoja) {
                 Hoja hoja = (Hoja) arbol;//casting
                 //ESCRIBIR DATOS
-                FileWriter f = new FileWriter(ruta,true);
+                FileWriter f = new FileWriter(ruta);
                 BufferedWriter bw = new BufferedWriter(f);
-                bw.write("\n"+hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
                 bw.newLine();
+                bw.write(hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
                 bw.close();
 
 

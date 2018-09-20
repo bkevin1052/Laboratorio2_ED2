@@ -15,44 +15,45 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    public Button btnHuffman, btnLZW,btnMisCompresiones;
+    public Button btnHuffman, btnLZW, btnMisCompresiones;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        btnHuffman = (Button)findViewById(R.id.btnHuffman);
-        btnLZW = (Button)findViewById(R.id.btnLzw);
-        btnMisCompresiones = (Button)findViewById(R.id.btnMisCompresiones);
+        btnHuffman = (Button) findViewById(R.id.btnHuffman);
+        btnLZW = (Button) findViewById(R.id.btnLzw);
+        btnMisCompresiones = (Button) findViewById(R.id.btnMisCompresiones);
 
 
-        btnHuffman.setOnClickListener(view ->{
+        btnHuffman.setOnClickListener(view -> {
             FilesActivity.seleccion = 1;
             startActivity(new Intent(getApplicationContext(), FilesActivity.class));
         });
 
-        btnLZW.setOnClickListener(view ->{
+        btnLZW.setOnClickListener(view -> {
             FilesActivity.seleccion = 2;
-            startActivity(new Intent(getApplicationContext(),FilesActivity.class));
+            startActivity(new Intent(getApplicationContext(), FilesActivity.class));
         });
 
-        btnMisCompresiones.setOnClickListener(view ->{
+        btnMisCompresiones.setOnClickListener(view -> {
             cargarDatos();
         });
     }
 
 
-    private void cargarDatos(){
-        if(ListFilesActivity.listaArchivos.size() == 0) {
+    private void cargarDatos() {
+        if (ListFilesActivity.listaArchivos.size() == 0) {
             SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
             Gson gson = new Gson();
             String json = sharedPreferences.getString("lista archivos", null);
             Type type = new TypeToken<ArrayList<Archivo>>() {
             }.getType();
             ListFilesActivity.listaArchivos = gson.fromJson(json, type);
-        }else {
-            startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+            startActivity(new Intent(getApplicationContext(), ListFilesActivity.class));
+        } else {
+            startActivity(new Intent(getApplicationContext(), ListFilesActivity.class));
         }
     }
 }
