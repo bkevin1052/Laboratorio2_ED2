@@ -52,6 +52,32 @@ public class Huffman {
         return textoCifrado;
     }
 
+
+    public String decifrar(Arbol arbol, String decodificar) {
+
+        String decodificarTexto="";
+        Nodo nodo = (Nodo)arbol;
+        for (char code : decodificar.toCharArray()){
+            if (code == '0'){
+                if (nodo.izquierda instanceof Hoja) {
+                    decodificarTexto += ((Hoja)nodo.izquierda).valor; // Retorna el valor del lado izquierdo del arbol
+                    nodo = (Nodo)arbol; // Retorna a la raiz
+
+                }else{
+                    nodo = (Nodo)nodo.izquierda; // Continua recorriendo el lado izquierdo
+                }
+            }else if (code == '1'){
+                if (nodo.derecha instanceof Hoja) {
+                    decodificarTexto += ((Hoja)nodo.derecha).valor; // Retorna el valor del lado derecho del arbo
+                    nodo = (Nodo)arbol; //  Retorna a la raiz
+                }else{
+                    nodo = (Nodo)nodo.derecha; // Continua recorriendo el lado derecho
+                }
+            }
+        }
+        return decodificarTexto.toString(); // Retorna texto decodificado
+    }
+
     public static String obtenerBinario(Arbol arbol, StringBuffer prefijo, char c) {
 
         if (arbol instanceof Hoja) {
@@ -60,7 +86,6 @@ public class Huffman {
             if (hoja.valor == c ){
                 return prefijo.toString();
             }
-
         } else if (arbol instanceof Nodo) {
             Nodo nodo = (Nodo)arbol;
             prefijo.append('0');

@@ -20,6 +20,7 @@ public class Archivo {
         this.imagen = imagen;
     }
 
+
     public String getNombre() {
         return nombre;
     }
