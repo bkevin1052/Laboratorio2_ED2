@@ -105,7 +105,7 @@ public class ListFilesActivity extends AppCompatActivity {
     private void escrituraDescompresion(String path,String decodificacion){
         try{
             Random r = new Random();
-            int h = r.nextInt(100);
+            int h = r.nextInt(1000);
             String name = "dataDescomprimida"+h+".txt";
             File f = new File(path, name);
             if(!f.exists()){

@@ -47,7 +47,7 @@ public class FilesActivity extends AppCompatActivity {
     public static String data;
     Uri uriName;
     double bytesOriginal, bytesComprimido;
-    DecimalFormat df = new DecimalFormat("##.##");
+    DecimalFormat df = new DecimalFormat("###.###");
     int[] caracteresContador;
     StringBuilder texto = new StringBuilder();
 
@@ -191,7 +191,7 @@ public class FilesActivity extends AppCompatActivity {
         switch (seleccion) {
             case 1:
                 Random r = new Random();
-                int h = r.nextInt(100);
+                int h = r.nextInt(1000);
                 String name = "dataComprimida"+h+".huff";
                 try {
 
@@ -204,12 +204,13 @@ public class FilesActivity extends AppCompatActivity {
                     file.append(data.toString());
                     file.flush();
                     file.close();
-                    //obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
+                    ruta = path;
+                    obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
                     bytesComprimido = data.getBytes().toString().length();
                     double razonCompresion, factorCompresion, porcentajeReduccion;
                     razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
                     factorCompresion = Double.parseDouble(df.format(bytesOriginal / bytesComprimido));
-                    porcentajeReduccion = Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100));
+                    porcentajeReduccion = 100-(Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100)));
                     Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
                     ListFilesActivity.listaArchivos.add(new Archivo(
                             name,
@@ -237,9 +238,10 @@ public class FilesActivity extends AppCompatActivity {
             if (arbol instanceof Hoja) {
                 Hoja hoja = (Hoja) arbol;//casting
                 //ESCRIBIR DATOS
-                FileWriter f = new FileWriter(FilesActivity.ruta,true);
+                FileWriter f = new FileWriter(ruta,true);
                 BufferedWriter bw = new BufferedWriter(f);
                 bw.write("\n"+hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
+                bw.newLine();
                 bw.close();
 
 
