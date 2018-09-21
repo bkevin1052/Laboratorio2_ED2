@@ -205,7 +205,7 @@ public class FilesActivity extends AppCompatActivity {
                     file.flush();
                     file.close();
                     ruta = path+"/"+name;
-                    obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
+                    //obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
                     bytesComprimido = data.getBytes().toString().length();
                     double razonCompresion, factorCompresion, porcentajeReduccion;
                     razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
@@ -234,16 +234,15 @@ public class FilesActivity extends AppCompatActivity {
 
     public void obtenerFrecuencias(Arbol arbol, StringBuffer prefijo) {
         try {
+            FileWriter f = new FileWriter(ruta, true);
+            BufferedWriter bw = new BufferedWriter(f);
             if (arbol instanceof Hoja) {
                 Hoja hoja = (Hoja) arbol;//casting
                 //ESCRIBIR DATOS
-                FileWriter f = new FileWriter(ruta);
-                BufferedWriter bw = new BufferedWriter(f);
-                bw.newLine();
+
                 bw.write(hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
+                bw.newLine();
                 bw.close();
-
-
             } else if (arbol instanceof Nodo) {
                 Nodo nodo = (Nodo) arbol;
                 prefijo.append('0');
