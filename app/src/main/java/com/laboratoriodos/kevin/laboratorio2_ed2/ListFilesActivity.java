@@ -52,21 +52,26 @@ public class ListFilesActivity extends AppCompatActivity {
             dlgAlert.setMessage("Esta seguro en descomprimir el archivo?");
             dlgAlert.setTitle("Descomprimir archivo");
             dlgAlert.setPositiveButton("SI", (dialogInterface, i) -> {
-                        Archivo archivoSeleccionado = listaArchivos.get(RecyclerViewMisCompresiones.getChildAdapterPosition(view));
-                        String binario = lecturaDescompresion(archivoSeleccionado.getRuta() + "/" + archivoSeleccionado.getNombre());
-                        String descifrado = FilesActivity.cifrado.decifrar(FilesActivity.arbol, binario);
-                        StorageChooser chooser = new StorageChooser.Builder()
-                                .withActivity(ListFilesActivity.this)
-                                .withFragmentManager(getFragmentManager())
-                                .withMemoryBar(true)
-                                .allowCustomPath(true)
-                                .setType(StorageChooser.DIRECTORY_CHOOSER)
-                                .build();
-                        chooser.show();
-                        Toast.makeText(getApplicationContext(),"Seleccione una ruta",Toast.LENGTH_SHORT).show();
-                        chooser.setOnSelectListener(path -> {
-                            escrituraDescompresion(path, descifrado);
-                        });
+
+                if(FilesActivity.seleccion == 1) {
+                    Archivo archivoSeleccionado = listaArchivos.get(RecyclerViewMisCompresiones.getChildAdapterPosition(view));
+                    String binario = lecturaDescompresion(archivoSeleccionado.getRuta() + "/" + archivoSeleccionado.getNombre());
+                    String descifrado = FilesActivity.cifrado.decifrar(FilesActivity.arbol, binario);
+                    StorageChooser chooser = new StorageChooser.Builder()
+                            .withActivity(ListFilesActivity.this)
+                            .withFragmentManager(getFragmentManager())
+                            .withMemoryBar(true)
+                            .allowCustomPath(true)
+                            .setType(StorageChooser.DIRECTORY_CHOOSER)
+                            .build();
+                    chooser.show();
+                    Toast.makeText(getApplicationContext(), "Seleccione una ruta", Toast.LENGTH_SHORT).show();
+                    chooser.setOnSelectListener(path -> {
+                        escrituraDescompresion(path, descifrado);
+                    });
+                }else{
+                    //LZW
+                }
             });
             dlgAlert.setNegativeButton("NO", (dialogInterface, i) -> dialogInterface.cancel());
             dlgAlert.setCancelable(true);

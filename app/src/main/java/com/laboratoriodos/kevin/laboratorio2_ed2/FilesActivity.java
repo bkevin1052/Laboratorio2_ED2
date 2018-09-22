@@ -17,19 +17,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.codekidlabs.storagechooser.StorageChooser;
+import com.laboratoriodos.kevin.laboratorio2_ed2.LZW.lzw;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Archivo;
 import com.laboratoriodos.kevin.laboratorio2_ed2.clases.Huffman;
 import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Arbol;
-import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Hoja;
-import com.laboratoriodos.kevin.laboratorio2_ed2.huffman.Nodo;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,14 +48,15 @@ public class FilesActivity extends AppCompatActivity {
     int[] caracteresContador;
     StringBuilder texto = new StringBuilder();
 
-
     //OBJETOS
     Button btnElegirArchivo, btnComprimir;
     TextView contenido;
+    StorageChooser chooser;
 
     //POO
     public static Huffman cifrado;
     public static Arbol arbol;
+    public lzw LZW;
 
 
     //METODOS
@@ -103,7 +101,7 @@ public class FilesActivity extends AppCompatActivity {
                     arbol = cifrado.arbolHuffman(caracteresContador);
                     data = cifrado.cifrar(arbol, texto.toString());
                     contenido.setText(data);
-                        StorageChooser chooser = new StorageChooser.Builder()
+                    chooser = new StorageChooser.Builder()
                                 .withActivity(FilesActivity.this)
                                 .withFragmentManager(getFragmentManager())
                                 .withMemoryBar(true)
@@ -126,7 +124,30 @@ public class FilesActivity extends AppCompatActivity {
                         });
                     break;
                 case 2:
-                    //LZW
+                    LZW = new lzw(texto.toString());
+                    data = LZW.comprimir(LZW.getCadena());
+                    contenido.setText(data);
+                    chooser = new StorageChooser.Builder()
+                            .withActivity(FilesActivity.this)
+                            .withFragmentManager(getFragmentManager())
+                            .withMemoryBar(true)
+                            .allowCustomPath(true)
+                            .setType(StorageChooser.DIRECTORY_CHOOSER)
+                            .build();
+                    chooser.show();
+                    chooser.setOnSelectListener(path -> {
+                        Boolean hasPermission = (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                == PackageManager.PERMISSION_GRANTED);
+                        if (!hasPermission) {
+                            Log.e("MainActivity", "get permision   ");
+                            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                        } else {
+                            Log.e("MainActivity", "get permision-- already granted ");
+                            escrituraArchivo(path);
+                            finish();
+                            startActivity(new Intent(getApplicationContext(),ListFilesActivity.class));
+                        }
+                    });
                     break;
             }
         });
@@ -187,15 +208,14 @@ public class FilesActivity extends AppCompatActivity {
     }
 
     private void escrituraArchivo(String path) {
-
         switch (seleccion) {
             case 1:
                 Random r = new Random();
-                int h = r.nextInt(1000);
-                String name = "dataComprimida"+h+".huff";
+                int huff = r.nextInt(1000);
+                String nombreHUFF = "dataComprimida"+huff+".huff";
                 try {
 
-                    File f = new File(path, name);
+                    File f = new File(path, nombreHUFF);
                     if(!f.exists()) {
                         f.createNewFile();
                     }
@@ -204,7 +224,7 @@ public class FilesActivity extends AppCompatActivity {
                     file.append(data.toString());
                     file.flush();
                     file.close();
-                    ruta = path+"/"+name;
+                    ruta = path+"/"+nombreHUFF;
                     //obtenerFrecuencias(cifrado.arbolHuffman(caracteresContador),new StringBuffer());
                     bytesComprimido = data.getBytes().toString().length();
                     double razonCompresion, factorCompresion, porcentajeReduccion;
@@ -213,7 +233,7 @@ public class FilesActivity extends AppCompatActivity {
                     porcentajeReduccion = 100-(Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100)));
                     Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
                     ListFilesActivity.listaArchivos.add(new Archivo(
-                            name,
+                            nombreHUFF,
                             path,
                             razonCompresion,
                             factorCompresion,
@@ -227,33 +247,41 @@ public class FilesActivity extends AppCompatActivity {
                 }
                 break;
             case 2:
-                //LZW
+                Random random = new Random();
+                int LZW = random.nextInt(1000);
+                String nombreLZW = "dataComprimida"+LZW+".lzw";
+                try {
+
+                    File f = new File(path, nombreLZW);
+                    if(!f.exists()) {
+                        f.createNewFile();
+                    }
+                    FileOutputStream fos = new FileOutputStream(f);
+                    OutputStreamWriter file = new OutputStreamWriter(fos);
+                    file.append(data.toString());
+                    file.flush();
+                    file.close();
+                    ruta = path+"/"+nombreLZW;
+                    bytesComprimido = data.getBytes().toString().length();
+                    double razonCompresion, factorCompresion, porcentajeReduccion;
+                    razonCompresion = Double.parseDouble(df.format(bytesComprimido / bytesOriginal));
+                    factorCompresion = Double.parseDouble(df.format(bytesOriginal / bytesComprimido));
+                    porcentajeReduccion = 100-(Double.parseDouble(df.format((bytesComprimido / bytesOriginal) * 100)));
+                    Toast.makeText(getApplicationContext(), "Compresion realizada correctamente en " + path, Toast.LENGTH_SHORT).show();
+                    ListFilesActivity.listaArchivos.add(new Archivo(
+                            nombreLZW,
+                            path,
+                            razonCompresion,
+                            factorCompresion,
+                            porcentajeReduccion,
+                            "LZW",
+                            R.drawable.iconolista));
+                } catch (FileNotFoundException e) {
+                    Log.i("ARCHIVO", e.toString());
+                } catch (IOException e) {
+                    Log.i("ARCHIVO", e.toString());
+                }
                 break;
         }
-    }
-
-    public void obtenerFrecuencias(Arbol arbol, StringBuffer prefijo) {
-        try {
-            FileWriter f = new FileWriter(ruta, true);
-            BufferedWriter bw = new BufferedWriter(f);
-            if (arbol instanceof Hoja) {
-                Hoja hoja = (Hoja) arbol;//casting
-                //ESCRIBIR DATOS
-
-                bw.write(hoja.valor +"\t"+hoja.frecuencia+"\t\t"+prefijo);
-                bw.newLine();
-                bw.close();
-            } else if (arbol instanceof Nodo) {
-                Nodo nodo = (Nodo) arbol;
-                prefijo.append('0');
-                obtenerFrecuencias(nodo.izquierda, prefijo);
-                prefijo.deleteCharAt(prefijo.length() - 1);
-               prefijo.append('1');
-                obtenerFrecuencias(nodo.derecha, prefijo);
-                prefijo.deleteCharAt(prefijo.length() - 1);
-            }
-        }catch (Exception e){
-            //mensaje de error
-       }
     }
 }

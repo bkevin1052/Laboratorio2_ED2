@@ -13,6 +13,13 @@ public class lzw {
         this.cadena = cadena;
     }
 
+    public String getCadena() {
+        return cadena;
+    }
+
+    public void setCadena(String cadena) {
+        this.cadena = cadena;
+    }
 
     /**
      * codificarUTF8
@@ -20,7 +27,6 @@ public class lzw {
      * @return resultado
      */
     public String comprimir(String cadena){
-        cadena = codificarUTF8(cadena);
         int index = DICT_TAMANIO;
         //Instancia del dicciario de letras
         Map<String,Integer> letrasDiccionario = new HashMap<String,Integer>();
@@ -36,7 +42,7 @@ public class lzw {
             else {
                 int i = letrasDiccionario.get(w);
                 resultado.append((char) i);
-                // Add wc to the dictionary.
+
                 letrasDiccionario.put(wc, index++);
                 w = "" + c;
             }
@@ -44,34 +50,6 @@ public class lzw {
         if (!w.equals("")) {
             int i = letrasDiccionario.get(w);
             resultado.append((char) i);
-        }
-        return resultado.toString();
-    }
-
-    /**
-     * codificarUTF8
-     * @param cadena
-     * @return resultado
-     */
-    public String codificarUTF8(String cadena) {
-        StringBuilder resultado = new StringBuilder();
-        for (char c : cadena.toCharArray()) {
-            int i = (int) c;
-            if (i < 128) {
-                resultado.append((char) i);
-            } else if (i > 127 && i < 2048) {
-                int j = (i >> 6) | 192;
-                resultado.append((char) j);
-                j = (i & 63) | 128;
-                resultado.append((char) j);
-            } else {
-                int j = (i >> 12) | 224;
-                resultado.append((char) j);
-                j = ((i >> 6) & 63) | 128;
-                resultado.append((char) j);
-                j = (c & 63) | 128;
-                resultado.append((char) j);
-            }
         }
         return resultado.toString();
     }
