@@ -22,14 +22,13 @@ public class lzw {
     }
 
     /**
-     * codificarUTF8
      * @param cadena
      * @return resultado
      */
     public String comprimir(String cadena){
         int index = DICT_TAMANIO;
         //Instancia del dicciario de letras
-        Map<String,Integer> letrasDiccionario = new HashMap<String,Integer>();
+        Map<String,Integer> letrasDiccionario = new HashMap<>();
         for (int i = 0; i < DICT_TAMANIO; i++) {
             letrasDiccionario.put("" + (char) i, i);
         }
@@ -53,4 +52,34 @@ public class lzw {
         }
         return resultado.toString();
     }
+
+    /**
+     * @param cadena
+     * @return resultado
+     */
+    public String descomprimir(String cadena) {        ;
+        int index = DICT_TAMANIO;
+        Map<Integer,String> letrasDictionario = new HashMap<>();
+        for (int i = 0; i < DICT_TAMANIO; i++)
+            letrasDictionario.put(i, "" + (char)i);
+
+        char[] chars = cadena.toCharArray();
+        String w = "" + chars[0];
+        StringBuffer resultado = new StringBuffer(w);
+        for (int j = 1; j < chars.length; j++) {
+            int k = (int) chars[j];
+            String entrada;
+            if (letrasDictionario.containsKey(k))
+                entrada = letrasDictionario.get(k);
+            else if (k == index)
+                entrada = w + w.charAt(0);
+            else
+                throw new IllegalArgumentException("ERROR: " + k);
+            resultado.append(entrada);
+            letrasDictionario.put(index++, w + entrada.charAt(0));
+            w = entrada;
+        }
+        return resultado.toString();
+    }
+
 }

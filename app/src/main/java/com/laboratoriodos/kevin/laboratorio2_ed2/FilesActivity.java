@@ -56,7 +56,7 @@ public class FilesActivity extends AppCompatActivity {
     //POO
     public static Huffman cifrado;
     public static Arbol arbol;
-    public lzw LZW;
+    public static lzw LZW;
 
 
     //METODOS

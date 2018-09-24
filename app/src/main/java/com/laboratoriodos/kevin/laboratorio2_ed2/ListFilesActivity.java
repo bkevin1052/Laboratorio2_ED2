@@ -53,8 +53,9 @@ public class ListFilesActivity extends AppCompatActivity {
             dlgAlert.setTitle("Descomprimir archivo");
             dlgAlert.setPositiveButton("SI", (dialogInterface, i) -> {
 
-                if(FilesActivity.seleccion == 1) {
+
                     Archivo archivoSeleccionado = listaArchivos.get(RecyclerViewMisCompresiones.getChildAdapterPosition(view));
+                if(archivoSeleccionado.getAlgoritmoDeCompresion() ==  "HUFFMAN") {
                     String binario = lecturaDescompresion(archivoSeleccionado.getRuta() + "/" + archivoSeleccionado.getNombre());
                     String descifrado = FilesActivity.cifrado.decifrar(FilesActivity.arbol, binario);
                     StorageChooser chooser = new StorageChooser.Builder()
@@ -70,7 +71,20 @@ public class ListFilesActivity extends AppCompatActivity {
                         escrituraDescompresion(path, descifrado);
                     });
                 }else{
-                    //LZW
+                    String textoComprimido = lecturaDescompresion(archivoSeleccionado.getRuta() + "/" + archivoSeleccionado.getNombre());
+                    String descomprimido = FilesActivity.LZW.descomprimir(textoComprimido);
+                    StorageChooser chooser = new StorageChooser.Builder()
+                            .withActivity(ListFilesActivity.this)
+                            .withFragmentManager(getFragmentManager())
+                            .withMemoryBar(true)
+                            .allowCustomPath(true)
+                            .setType(StorageChooser.DIRECTORY_CHOOSER)
+                            .build();
+                    chooser.show();
+                    Toast.makeText(getApplicationContext(), "Seleccione una ruta", Toast.LENGTH_SHORT).show();
+                    chooser.setOnSelectListener(path -> {
+                        escrituraDescompresion(path, descomprimido);
+                    });
                 }
             });
             dlgAlert.setNegativeButton("NO", (dialogInterface, i) -> dialogInterface.cancel());
