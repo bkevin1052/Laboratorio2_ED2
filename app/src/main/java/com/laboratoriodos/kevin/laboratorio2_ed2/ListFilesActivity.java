@@ -53,7 +53,6 @@ public class ListFilesActivity extends AppCompatActivity {
             dlgAlert.setTitle("Descomprimir archivo");
             dlgAlert.setPositiveButton("SI", (dialogInterface, i) -> {
 
-
                     Archivo archivoSeleccionado = listaArchivos.get(RecyclerViewMisCompresiones.getChildAdapterPosition(view));
                 if(archivoSeleccionado.getAlgoritmoDeCompresion() ==  "HUFFMAN") {
                     String binario = lecturaDescompresion(archivoSeleccionado.getRuta() + "/" + archivoSeleccionado.getNombre());
@@ -112,7 +111,7 @@ public class ListFilesActivity extends AppCompatActivity {
             BufferedReader br = new BufferedReader(new InputStreamReader(f));
             String inputLine;
             while ((inputLine = br.readLine()) != null) {
-                texto.append(" " + inputLine);
+                texto.append(inputLine + "\n");
             }
             br.close();
         } catch (Exception e) {

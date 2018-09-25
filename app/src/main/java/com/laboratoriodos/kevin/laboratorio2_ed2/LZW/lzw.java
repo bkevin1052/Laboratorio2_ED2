@@ -30,7 +30,7 @@ public class lzw {
         //Instancia del dicciario de letras
         Map<String,Integer> letrasDiccionario = new HashMap<>();
         for (int i = 0; i < DICT_TAMANIO; i++) {
-            letrasDiccionario.put("" + (char) i, i);
+            letrasDiccionario.put(""+(char) i, i);
         }
         String w = "";
         StringBuilder resultado = new StringBuilder();
@@ -57,11 +57,11 @@ public class lzw {
      * @param cadena
      * @return resultado
      */
-    public String descomprimir(String cadena) {        ;
+    public String descomprimir(String cadena) {
         int index = DICT_TAMANIO;
-        Map<Integer,String> letrasDictionario = new HashMap<>();
+        Map<Integer,String> letrasDiccionario = new HashMap<>();
         for (int i = 0; i < DICT_TAMANIO; i++)
-            letrasDictionario.put(i, "" + (char)i);
+            letrasDiccionario.put(i, "" + (char)i);
 
         char[] chars = cadena.toCharArray();
         String w = "" + chars[0];
@@ -69,14 +69,17 @@ public class lzw {
         for (int j = 1; j < chars.length; j++) {
             int k = (int) chars[j];
             String entrada;
-            if (letrasDictionario.containsKey(k))
-                entrada = letrasDictionario.get(k);
-            else if (k == index)
+            if (letrasDiccionario.containsKey(k)) {
+                entrada = letrasDiccionario.get(k);
+            }
+            else if (k == index) {
                 entrada = w + w.charAt(0);
-            else
+            }
+            else {
                 throw new IllegalArgumentException("ERROR: " + k);
+            }
             resultado.append(entrada);
-            letrasDictionario.put(index++, w + entrada.charAt(0));
+            letrasDiccionario.put(index++, w + entrada.charAt(0));
             w = entrada;
         }
         return resultado.toString();
