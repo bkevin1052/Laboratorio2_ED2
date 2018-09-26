@@ -45,6 +45,7 @@ public class ListFilesActivity extends AppCompatActivity {
         adapterMisCompresiones = new Adapter(this,listaArchivos);
         RecyclerViewMisCompresiones.setAdapter(adapterMisCompresiones);
 
+        Toast.makeText(getApplicationContext(),"Haga click sobre cualquier compresion para descomprimir",Toast.LENGTH_SHORT).show();
         guardarDatos();
 
         adapterMisCompresiones.setOnClickListener(view ->        {
